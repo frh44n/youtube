@@ -26,8 +26,8 @@ class User(Base):
 # Create the database tables
 Base.metadata.create_all(engine)
 
-# Bot token
-TOKEN = 'YOUR_BOT_TOKEN'
+# Bot token and admin configuration
+TOKEN = '7063619963:AAEFPnp3F7sePbM6ElHtTju1PQH_9B5_eCM'
 WEBHOOK_URL = 'https://your-service-url.onrender.com'
 ADMIN_ID = '6826870863'
 
