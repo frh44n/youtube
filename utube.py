@@ -28,7 +28,7 @@ Base.metadata.create_all(engine)
 
 # Bot token and admin configuration
 TOKEN = '7063619963:AAEFPnp3F7sePbM6ElHtTju1PQH_9B5_eCM'
-WEBHOOK_URL = 'https://your-service-url.onrender.com'
+WEBHOOK_URL = 'https://utube-py.onrender.com'
 ADMIN_ID = '6826870863'
 
 # Set up logging
