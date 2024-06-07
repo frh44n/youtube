@@ -1,6 +1,6 @@
-import os
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, CallbackQueryHandler
+from telegram.ext.filters import Filters
 import pytube
 import logging
 
