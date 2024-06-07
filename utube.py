@@ -1,29 +1,36 @@
-from flask import Flask, request, jsonify
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import requests
-import pytube
 
-app = Flask(__name__)
+# Function to handle start command
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Hi! Send me an Instagram reel link and I will download it for you.')
 
-# Telegram Bot API endpoint
-TELEGRAM_API_URL = 'https://api.telegram.org/bot<7063619963:AAEFPnp3F7sePbM6ElHtTju1PQH_9B5_eCM>/sendMessage'
+# Function to handle messages
+def echo(update: Update, context: CallbackContext) -> None:
+    reel_link = update.message.text
+    # Assuming you have a function to download Instagram reels
+    download_reel(reel_link)
+    update.message.reply_text('Reel downloaded successfully!')
 
-# Handler for incoming messages
-@app.route('/', methods=['POST'])
-def handle_message():
-    data = request.json
-    chat_id = data['message']['chat']['id']
-    video_link = data['message']['text']
-    
-    # Download the YouTube video
-    yt = pytube.YouTube(video_link)
-    stream = yt.streams.first()
-    stream.download()
-    
-    # Send the downloaded video to the user
-    files = {'video': open('video.mp4', 'rb')}
-    requests.post(TELEGRAM_API_URL, data={'chat_id': chat_id}, files=files)
-    
-    return jsonify(success=True)
+# Function to download Instagram reel
+def download_reel(link):
+    # Implement your code to download the reel here
+    pass
+
+# Main function
+def main():
+    # Set up the Telegram bot
+    updater = Updater("7063619963:AAEFPnp3F7sePbM6ElHtTju1PQH_9B5_eCM")
+    dispatcher = updater.dispatcher
+
+    # Handlers
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+
+    # Start the bot
+    updater.start_polling()
+    updater.idle()
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    main()
