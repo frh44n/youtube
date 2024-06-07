@@ -1,51 +1,29 @@
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, CallbackQueryHandler
-from telegram.ext.filters import Filters
+from flask import Flask, request, jsonify
+import requests
 import pytube
-import logging
 
-# Set up logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
+app = Flask(__name__)
 
-# Get the bot token from the environment variable
-TOKEN = os.environ.get('BOT_TOKEN')
+# Telegram Bot API endpoint
+TELEGRAM_API_URL = 'https://api.telegram.org/bot<7063619963:AAEFPnp3F7sePbM6ElHtTju1PQH_9B5_eCM>/sendMessage'
 
-# Function to handle the /start command
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text("Welcome to the best and most powerful Telegram bot for downloading YouTube videos.")
-    show_options(update)
-
-# Function to show format options
-def show_options(update: Update) -> None:
-    keyboard = [[format] for format in ['mp3', '480p', '720p', '1080p', '2k']]
-    update.message.reply_text('Please select the format:', reply_markup=keyboard)
-
-# Function to handle button presses
-def handle_message(update: Update, context: CallbackContext) -> None:
-    download_video(update)
-
-# Function to download the video
-def download_video(update: Update) -> None:
-    # Get the YouTube video link from the user
-    video_link = update.message.text
-    try:
-        # Download the YouTube video
-        yt = pytube.YouTube(video_link)
-        stream = yt.streams.first()
-        stream.download()
-        update.message.reply_text(f"Video downloaded.")
-    except Exception as e:
-        update.message.reply_text("An error occurred while downloading the video.")
-
-def main() -> None:
-    updater = Updater(TOKEN)
-
-    updater.dispatcher.add_handler(CommandHandler('start', start))
-    updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
-
-    updater.start_polling()
-    updater.idle()
+# Handler for incoming messages
+@app.route('/', methods=['POST'])
+def handle_message():
+    data = request.json
+    chat_id = data['message']['chat']['id']
+    video_link = data['message']['text']
+    
+    # Download the YouTube video
+    yt = pytube.YouTube(video_link)
+    stream = yt.streams.first()
+    stream.download()
+    
+    # Send the downloaded video to the user
+    files = {'video': open('video.mp4', 'rb')}
+    requests.post(TELEGRAM_API_URL, data={'chat_id': chat_id}, files=files)
+    
+    return jsonify(success=True)
 
 if __name__ == '__main__':
-    main()
+    app.run(port=5000)
