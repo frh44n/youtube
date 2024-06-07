@@ -1,8 +1,8 @@
-import logging
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters, CallbackQueryHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, CallbackQueryHandler
+from telegram.ext.filters import Filters
 import pytube
+import logging
 
 # Set up logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -24,16 +24,17 @@ def start(update: Update, context: CallbackContext) -> None:
 
 # Function to show format options
 def show_options(update: Update) -> None:
-    keyboard = [[InlineKeyboardButton(format, callback_data=format)] for format in FORMATS]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    keyboard = [[format] for format in FORMATS]
+    reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
     update.message.reply_text('Please select the format:', reply_markup=reply_markup)
 
-# Function to handle button presses
-def button(update: Update, context: CallbackContext) -> None:
-    query = update.callback_query
-    query.answer()
-    query.edit_message_text(text=f"Selected option: {query.data}")
-    download_video(update, query.data)
+# Function to handle user input
+def handle_message(update: Update, context: CallbackContext) -> None:
+    format_selected = update.message.text
+    if format_selected in FORMATS:
+        download_video(update, format_selected)
+    else:
+        update.message.reply_text('Invalid format. Please select a valid format.')
 
 # Function to download the video
 def download_video(update: Update, format: str) -> None:
@@ -52,8 +53,7 @@ def main() -> None:
     updater = Updater(TOKEN)
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
-    updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, show_options))
-    updater.dispatcher.add_handler(CallbackQueryHandler(button))
+    updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
     updater.start_polling()
     updater.idle()
