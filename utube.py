@@ -9,7 +9,7 @@ import os
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # Bot token
-TOKEN = 'YOUR_BOT_TOKEN'
+TOKEN = '7063619963:AAEFPnp3F7sePbM6ElHtTju1PQH_9B5_eCM'
 
 def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     update.message.reply_text('Welcome! Please send me a YouTube link.')
