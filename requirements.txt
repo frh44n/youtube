@@ -1,2 +1,2 @@
-python-telegram-bot[webhooks]
+python-telegram-bot>=13.0.0
 pytube
